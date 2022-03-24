@@ -1,5 +1,5 @@
-coral
-1
+SlateBlue2
+10
 yes
 yes
 yes

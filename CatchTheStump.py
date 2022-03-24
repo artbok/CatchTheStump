@@ -99,7 +99,7 @@ def press_w(event):
             money_text.destroy()
             game = False
             menu()
-        if w_cooldown == None:
+        if not w_cooldown:
             y1 = y1 - 12
             cnvs.move(objects[0], 0, -12)
             w_cd()
@@ -107,7 +107,7 @@ def press_s(event):
     global s_cooldown, x1, y1
     if game == True:
         if y1 < 770:
-            if s_cooldown == None:
+            if not s_cooldown:
                 y1 = y1 + 12
                 cnvs.move(objects[0], 0, 12)
                 s_cd()
@@ -115,7 +115,7 @@ def press_a(event):
     global a_cooldown, x1, y1
     if game == True:
         if x1 > 30:   
-            if a_cooldown == None:
+            if not a_cooldown:
                 x1 = x1 - 12
                 cnvs.move(objects[0], -12, 0)
                 a_cd()
@@ -123,7 +123,7 @@ def press_d(event):
     global d_cooldown, x1, y1
     if game == True:
         if x1 < 670:
-            if d_cooldown == None:
+            if not d_cooldown:
                 x1 = x1 + 12
                 cnvs.move(objects[0], 12, 0)
                 d_cd()
