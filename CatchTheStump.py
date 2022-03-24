@@ -9,12 +9,6 @@ tk.title("Убеги от пенька")
 tk.config(cursor="plus")
 tk.iconbitmap("images\\icon.ico")
 objects = ["", "", "", ""]
-x1 = 350 
-y1 = 850
-h1 = 0
-h2 = 0
-h3 = 0 
-h4 = 0
 e = 0
 q = 0
 c = 0
@@ -23,11 +17,11 @@ b3 = 0
 b1 = 0
 v1 = []
 v2 = []
-w_cooldown = False
-a_cooldown = False
-d_cooldown = False
-s_cooldown = False
-wait_status = False
+w_cooldown = None
+a_cooldown = None
+d_cooldown = None
+s_cooldown = None
+jump_status = False
 game = True
 nomoney_status = False
 time = 0
@@ -97,7 +91,7 @@ def press_w(event):
             balance += 10
             balance = balance - deaths // 2
             lines = str(balance), "\n", str(deaths + total_deaths)
-            save_settings = open('settings.txt', 'w')
+            save_settings = open('resources\\settings.txt', 'w')
             save_settings.writelines(lines)
             save_settings.close()
             cnvs.delete("all")
@@ -105,7 +99,7 @@ def press_w(event):
             money_text.destroy()
             game = False
             menu()
-        if w_cooldown == False:
+        if not w_cooldown:
             y1 = y1 - 12
             cnvs.move(objects[0], 0, -12)
             w_cd()
@@ -113,7 +107,7 @@ def press_s(event):
     global s_cooldown, x1, y1
     if game == True:
         if y1 < 770:
-            if s_cooldown == False:
+            if not s_cooldown:
                 y1 = y1 + 12
                 cnvs.move(objects[0], 0, 12)
                 s_cd()
@@ -121,7 +115,7 @@ def press_a(event):
     global a_cooldown, x1, y1
     if game == True:
         if x1 > 30:   
-            if a_cooldown == False:
+            if not a_cooldown:
                 x1 = x1 - 12
                 cnvs.move(objects[0], -12, 0)
                 a_cd()
@@ -129,11 +123,11 @@ def press_d(event):
     global d_cooldown, x1, y1
     if game == True:
         if x1 < 670:
-            if d_cooldown == False:
+            if not d_cooldown:
                 x1 = x1 + 12
                 cnvs.move(objects[0], 12, 0)
                 d_cd()
-def cheat(event):
+def jump(event):
     global cooldown2, x1, y1, lines, cnvs, game, balance, total_deaths
     if game == True:
         if cooldown2 == False:
@@ -144,7 +138,7 @@ def cheat(event):
                 balance += 10
                 balance = balance - deaths // 2
                 lines = str(balance), "\n", str(deaths + total_deaths)
-                save_settings = open('settings.txt', 'w')
+                save_settings = open('resources\\settings.txt', 'w')
                 save_settings.writelines(lines)
                 save_settings.close()
                 cnvs.delete("all")
@@ -153,8 +147,8 @@ def cheat(event):
                 game = False
                 menu()
         else:
-            if wait_status == False:
-                wait()
+            if jump_status == False:
+                wait_jump()
 def cd2():
     global cooldown2, q, cd_status_image, cd_image, nocd_image, game
     if game == True:
@@ -171,58 +165,50 @@ def cd2():
             return
         else:
             tk.after(100, cd2)
-def wait():
-    global q, c, wait_text, wait_status
-    wait_status = True
+def wait_jump():
+    global q, c, jump_text, jump_status
+    jump_status = True
     c = c+1
     if c == 2:
-        cnvs.delete(wait_text)
-        tk.after_cancel(wait)
-        wait_status = False
+        cnvs.delete(jump_text)
+        tk.after_cancel(wait_jump)
+        jump_status = False
         c = 0
         return
-    wait_text = cnvs.create_text(350, 750, text=("Подождите " + str(10-(q//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
-    tk.after(1000, wait)
+    jump_text = cnvs.create_text(350, 750, text=("Подождите " + str(10-(q//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
+    tk.after(1000, wait_jump)
 def w_cd():
-    global w_cooldown, h1, x1, y1
-    w_cooldown = True
-    h1 = h1 + 1
-    if h1 == 2:
-        w_cooldown = False
+    global w_cooldown, x1, y1
+    w_cooldown = 1 if not w_cooldown else w_cooldown + 1 
+    if w_cooldown == 2:
+        w_cooldown = None
         tk.after_cancel(w_cd)
-        h1 = 0
         return
     tk.after(120, w_cd)
 def a_cd():
-    global a_cooldown, h2, x1, y1
-    a_cooldown = True
-    h2 = h2 + 1
-    if h2 == 2:
-        a_cooldown = False
+    global a_cooldown, x1, y1
+    a_cooldown = 1 if not a_cooldown else a_cooldown + 1 
+    if a_cooldown == 2:
+        a_cooldown = None
         tk.after_cancel(a_cd)
-        h2 = 0
         return
-    tk.after(80, a_cd)
+    tk.after(120, a_cd)
 def s_cd():
-    global s_cooldown, h3, x1, y1
-    s_cooldown = True
-    h3 = h3 + 1
-    if h3 == 2:
-        s_cooldown = False
+    global s_cooldown, x1, y1
+    s_cooldown = 1 if not s_cooldown else s_cooldown + 1 
+    if s_cooldown == 2:
+        s_cooldown = None
         tk.after_cancel(s_cd)
-        h3 = 0
         return
-    tk.after(80, s_cd)
+    tk.after(120, s_cd)
 def d_cd():
-    global d_cooldown, h4, x1, y1
-    d_cooldown = True
-    h4 = h4 + 1
-    if h4 == 2:
-        d_cooldown = False
+    global d_cooldown, x1, y1
+    d_cooldown = 1 if not d_cooldown else d_cooldown + 1 
+    if d_cooldown == 2:
+        d_cooldown = None
         tk.after_cancel(d_cd)
-        h4 = 0
         return
-    tk.after(80, d_cd)
+    tk.after(120, d_cd)
 def brevno1():
     global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1
     if game == True:
@@ -390,7 +376,7 @@ def shop():
     money_text = Label(text=balance, font=("Impact", 25))
     money_text.place(x=620, y=40)
     color_status = []
-    open_colors = open('colors.txt', 'r')
+    open_colors = open('resources\\colors.txt', 'r')
     lines = open_colors.readlines()
     open_colors.close()
     for i in range(len(lines)):
@@ -520,7 +506,7 @@ def key(event):
         if event.keycode == 83:
             press_s(event)
         if event.keycode == 81:
-            cheat(event)
+            jump(event)
     if event.keycode == 88:
             x(event)
     
