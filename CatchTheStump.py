@@ -10,8 +10,6 @@ tk.config(cursor="plus")
 tk.iconbitmap("images\\icon.ico")
 objects = ["", "", "", ""]
 e = 0
-q = 0
-c = 0
 b2 = 0
 b3 = 0
 b1 = 0
@@ -21,7 +19,8 @@ w_cooldown = None
 a_cooldown = None
 d_cooldown = None
 s_cooldown = None
-jump_status = False
+jump_text_cooldown = False
+jump_cooldown = None
 game = True
 nomoney_status = False
 time = 0
@@ -29,9 +28,8 @@ monetka = []
 deaths = 0
 coins_received = 0
 balance = 0
-cooldown2 = False
 def restart():
-    global cooldown, cooldown2, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
+    global jump_cooldown, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
     game = True
     deaths = 0
     monetka = []
@@ -42,8 +40,7 @@ def restart():
     bombs1 = []
     bombs2 = []
     bomba = []
-    сooldown = False
-    cooldown2 = False
+    jump_cooldown = None
     coins_received = 0
     brevno_status1 = False
     brevno_status2 = False
@@ -128,9 +125,9 @@ def press_d(event):
                 cnvs.move(objects[0], 12, 0)
                 d_cd()
 def jump(event):
-    global cooldown2, x1, y1, lines, cnvs, game, balance, total_deaths
+    global jump_cooldown, x1, y1, lines, cnvs, game, balance, total_deaths
     if game == True:
-        if cooldown2 == False:
+        if not jump_cooldown:
             y1 = y1 - 108
             cnvs.move(objects[0], 0,-108)
             cd2()
@@ -147,35 +144,35 @@ def jump(event):
                 game = False
                 menu()
         else:
-            if jump_status == False:
+            if not jump_text_cooldown:
                 wait_jump()
 def cd2():
-    global cooldown2, q, cd_status_image, cd_image, nocd_image, game
+    global jump_cooldown, cd_status_image, cd_image, nocd_image, game
     if game == True:
-        cooldown2 = True
-        q = q + 1
-        if q == 1:
+        if not jump_cooldown:
+            jump_cooldown = 0
+        jump_cooldown += 1
+        if jump_cooldown == 1:
             cnvs.delete(cd_status_image)
             cd_status_image = cnvs.create_image(490, 40, image=cd_image)
-        if q == 100:
-            cooldown2 = False
-            q = 0
+        if jump_cooldown == 100:
+            jump_cooldown = None
             cnvs.delete(cd_status_image)
             cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
             return
         else:
             tk.after(100, cd2)
 def wait_jump():
-    global q, c, jump_text, jump_status
-    jump_status = True
-    c = c+1
-    if c == 2:
+    global jump_cooldown, jump_text, jump_text_cooldown
+    if not jump_text_cooldown:
+        jump_text_cooldown = 0
+    jump_text_cooldown += 1
+    if jump_text_cooldown == 2:
         cnvs.delete(jump_text)
         tk.after_cancel(wait_jump)
-        jump_status = False
-        c = 0
+        jump_text_cooldown = None
         return
-    jump_text = cnvs.create_text(350, 750, text=("Подождите " + str(10-(q//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
+    jump_text = cnvs.create_text(350, 750, text=("Подождите " + str(10-(jump_cooldown//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
     tk.after(1000, wait_jump)
 def w_cd():
     global w_cooldown, x1, y1
