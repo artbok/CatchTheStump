@@ -1,5 +1,5 @@
-SlateBlue2
-10
+sienna4
+0
 yes
 yes
 yes

@@ -22,6 +22,7 @@ s_cooldown = None
 jump_text_cooldown = False
 jump_cooldown = None
 game = True
+help_status = False
 nomoney_status = False
 time = 0
 monetka = []
@@ -29,7 +30,7 @@ deaths = 0
 coins_received = 0
 balance = 0
 def restart():
-    global jump_cooldown, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
+    global jump_cooldown, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
     game = True
     deaths = 0
     monetka = []
@@ -57,7 +58,7 @@ def restart():
     open_colors.close()
     if balance > 999:
         balance = 999
-    cnvs = Canvas(bg=color)
+    cnvs = Canvas(bg=color, highlightbackground=color)
     cnvs.place(anchor=NW, height=900, width=700)
     cnvs.create_rectangle(-5, 100, 705, 105, fill="black")
     cnvs.create_rectangle(-5, 800, 705, 805, fill="black")
@@ -67,6 +68,11 @@ def restart():
     bomba_image = PhotoImage(file="images\\bomb.png")
     cd_image = PhotoImage(file="images\\cooldown_unavailable.png")
     nocd_image = PhotoImage(file="images\\cooldown_available.png")
+    pause_image = PhotoImage(file="images\\pause.png")
+    help_image = PhotoImage(file="images\\help.png")
+    rules_image = PhotoImage(file="images\\rules.png")
+    shop_image = PhotoImage(file="images\\shop.png")
+    continue_image = PhotoImage(file="images\\continue.png")
     cnvs.create_image(640, 40, image=deaths_image)
     cnvs.create_image(540, 40, image=coin_image)
     cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
@@ -74,10 +80,16 @@ def restart():
     death_text.place(x=660, y=20)
     money_text = Label(text=balance, bg=color, font=("Impact", 25))
     money_text.place(x=560, y=20)
+    pause_button = cnvs.create_image(50, 50, image=pause_image)
+    cnvs.tag_bind(pause_button, '<Button-1>', pause)
+    help_button = cnvs.create_image(130, 50, image=help_image)
+    cnvs.tag_bind(help_button, '<Button-1>', help)
+    shop_button = cnvs.create_image(210, 50, image=shop_image)
+    cnvs.tag_bind(shop_button, '<Button-1>', shop)
     objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
-    brevno1()
-    brevno2()
-    brevno3()
+    #brevno1()
+    #brevno2()
+    #brevno3()
     coins()
     gen_bomba()
     check()
@@ -337,7 +349,7 @@ def coins():
 def gen_bomba():
     global bomba, bombs1, bombs2
     for i in range(2):
-        a = random.randint(300, 800)
+        a = random.randint(200, 600)
         a = a - a % 20 - 10
         bombs1.append(a)
     for j in range(2):
@@ -365,59 +377,61 @@ def menu():
     balance_stats.place(x=20, y=520)
     play_again = Button(text="Играть снова", bg="green", command=restart, font=("Impact", 30))
     play_again.place(x=220, y=700, width=260, height=70)
-def shop():
-    global color_change, balance, color, coin_image, color_status, Buttons
-    cnvs = Canvas()
-    cnvs.place(anchor=NW, height=900, width=700)
-    cnvs.create_image(600, 60, image=coin_image)
-    money_text = Label(text=balance, font=("Impact", 25))
-    money_text.place(x=620, y=40)
-    color_status = []
-    open_colors = open('resources\\colors.txt', 'r')
-    lines = open_colors.readlines()
-    open_colors.close()
-    for i in range(len(lines)):
-        if lines[i] == "yes\n":
-            color_status.append("Выбрать")
-        elif lines[i] == "no\n" or lines[i] == "no":
-            color_status.append("Купить")
-    selected = int(lines[1])
-    color_status[selected] = "Выбрано"
-    text = Label(text="Магазин", font=("Impact", 50))
-    text.place(x=10, y=20)
-    play_button = Button(text="Назад", bg="red", command=restart, font=("Impact", 30))
-    play_button.place(x=230, y=770, width=200, height=100)
-    Buttons = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
-    Buttons[0] = Button(bg="sienna4", text=color_status[0], anchor=SW, command=lambda:(buy_color("sienna4", 0)), font=("Impact", 12))
-    Buttons[0].place(x=20, y=120, width=100, height=100)
-    Buttons[1] = Button(bg="coral", text=color_status[1], anchor=SW, command=lambda:(buy_color("coral", 1)), font=("Impact", 12))
-    Buttons[1].place(x=20, y=240, width=100, height=100)
-    Buttons[2] = Button(bg="orange", text=color_status[2], anchor=SW, command=lambda:(buy_color("orange", 2)), font=("Impact", 12))
-    Buttons[2].place(x=20, y=360, width=100, height=100)
-    Buttons[3] = Button(bg="gold", text=color_status[3], anchor=SW, command=lambda:(buy_color("gold", 3)), font=("Impact", 12))
-    Buttons[3].place(x=20, y=480, width=100, height=100)
-    Buttons[4] = Button(bg="yellow", text=color_status[4], anchor=SW, command=lambda:(buy_color("yellow", 4)), font=("Impact", 12))
-    Buttons[4].place(x=20, y=600, width=100, height=100)
-    Buttons[5] = Button(bg="green", text=color_status[5], anchor=SW, command=lambda:(buy_color("green", 5)), font=("Impact", 12))
-    Buttons[5].place(x=140, y=120, width=100, height=100)
-    Buttons[6] = Button(bg="lime", text=color_status[6], anchor=SW, command=lambda:(buy_color("lime", 6)), font=("Impact", 12))
-    Buttons[6].place(x=140, y=240, width=100, height=100)
-    Buttons[7] = Button(bg="cyan", text=color_status[7], anchor=SW, command=lambda:(buy_color("cyan", 7)), font=("Impact", 12))
-    Buttons[7].place(x=140, y=360, width=100, height=100)
-    Buttons[8] = Button(bg="turquoise", text=color_status[8], anchor=SW, command=lambda:(buy_color("turquoise", 8)), font=("Impact", 12))
-    Buttons[8].place(x=140, y=480, width=100, height=100)
-    Buttons[9] = Button(bg="blue", text=color_status[9], anchor=SW, command=lambda:(buy_color("blue", 9)), font=("Impact", 12))
-    Buttons[9].place(x=140, y=600, width=100, height=100)
-    Buttons[10] = Button(bg="SlateBlue2", text=color_status[10], anchor=SW, command=lambda:(buy_color("SlateBlue2", 10)), font=("Impact", 12))
-    Buttons[10].place(x=260, y=120, width=100, height=100)
-    Buttons[11] = Button(bg="Purple", text=color_status[11], anchor=SW, command=lambda:(buy_color("Purple", 11)), font=("Impact", 12))
-    Buttons[11].place(x=260, y=240, width=100, height=100)
-    Buttons[12] = Button(bg="DarkOrchid1", text=color_status[12], anchor=SW, command=lambda:(buy_color("DarkOrchid1", 12)), font=("Impact", 12))
-    Buttons[12].place(x=260, y=360, width=100, height=100)
-    Buttons[13] = Button(bg="Pink", text=color_status[13], anchor=SW, command=lambda:(buy_color("Pink", 13)), font=("Impact", 12))
-    Buttons[13].place(x=260, y=480, width=100, height=100)
-    Buttons[14] = Button(bg="White", text=color_status[14], anchor=SW, command=lambda:(buy_color("White", 14)), font=("Impact", 12))
-    Buttons[14].place(x=260, y=600, width=100, height=100)
+def shop(event):
+    global balance, coin_image, color_status, Buttons, game
+    if help_status == False:
+        game = False
+        cnvs = Canvas()
+        cnvs.place(anchor=NW, height=900, width=700)
+        cnvs.create_image(600, 60, image=coin_image)
+        money_text = Label(text=balance, font=("Impact", 25))
+        money_text.place(x=620, y=40)
+        color_status = []
+        open_colors = open('resources\\colors.txt', 'r')
+        lines = open_colors.readlines()
+        open_colors.close()
+        for i in range(len(lines)):
+            if lines[i] == "yes\n":
+                color_status.append("Выбрать")
+            elif lines[i] == "no\n" or lines[i] == "no":
+                color_status.append("Купить")
+        selected = int(lines[1])
+        color_status[selected] = "Выбрано"
+        text = Label(text="Магазин", font=("Impact", 50))
+        text.place(x=10, y=20)
+        play_button = Button(text="Назад", bg="red", command=restart, font=("Impact", 30))
+        play_button.place(x=230, y=770, width=200, height=100)
+        Buttons = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+        Buttons[0] = Button(bg="sienna4", text=color_status[0], anchor=SW, command=lambda:(buy_color("sienna4", 0)), font=("Impact", 12))
+        Buttons[0].place(x=20, y=120, width=100, height=100)
+        Buttons[1] = Button(bg="coral", text=color_status[1], anchor=SW, command=lambda:(buy_color("coral", 1)), font=("Impact", 12))
+        Buttons[1].place(x=20, y=240, width=100, height=100)
+        Buttons[2] = Button(bg="orange", text=color_status[2], anchor=SW, command=lambda:(buy_color("orange", 2)), font=("Impact", 12))
+        Buttons[2].place(x=20, y=360, width=100, height=100)
+        Buttons[3] = Button(bg="gold", text=color_status[3], anchor=SW, command=lambda:(buy_color("gold", 3)), font=("Impact", 12))
+        Buttons[3].place(x=20, y=480, width=100, height=100)
+        Buttons[4] = Button(bg="yellow", text=color_status[4], anchor=SW, command=lambda:(buy_color("yellow", 4)), font=("Impact", 12))
+        Buttons[4].place(x=20, y=600, width=100, height=100)
+        Buttons[5] = Button(bg="green", text=color_status[5], anchor=SW, command=lambda:(buy_color("green", 5)), font=("Impact", 12))
+        Buttons[5].place(x=140, y=120, width=100, height=100)
+        Buttons[6] = Button(bg="lime", text=color_status[6], anchor=SW, command=lambda:(buy_color("lime", 6)), font=("Impact", 12))
+        Buttons[6].place(x=140, y=240, width=100, height=100)
+        Buttons[7] = Button(bg="cyan", text=color_status[7], anchor=SW, command=lambda:(buy_color("cyan", 7)), font=("Impact", 12))
+        Buttons[7].place(x=140, y=360, width=100, height=100)
+        Buttons[8] = Button(bg="turquoise", text=color_status[8], anchor=SW, command=lambda:(buy_color("turquoise", 8)), font=("Impact", 12))
+        Buttons[8].place(x=140, y=480, width=100, height=100)
+        Buttons[9] = Button(bg="blue", text=color_status[9], anchor=SW, command=lambda:(buy_color("blue", 9)), font=("Impact", 12))
+        Buttons[9].place(x=140, y=600, width=100, height=100)
+        Buttons[10] = Button(bg="SlateBlue2", text=color_status[10], anchor=SW, command=lambda:(buy_color("SlateBlue2", 10)), font=("Impact", 12))
+        Buttons[10].place(x=260, y=120, width=100, height=100)
+        Buttons[11] = Button(bg="Purple", text=color_status[11], anchor=SW, command=lambda:(buy_color("Purple", 11)), font=("Impact", 12))
+        Buttons[11].place(x=260, y=240, width=100, height=100)
+        Buttons[12] = Button(bg="DarkOrchid1", text=color_status[12], anchor=SW, command=lambda:(buy_color("DarkOrchid1", 12)), font=("Impact", 12))
+        Buttons[12].place(x=260, y=360, width=100, height=100)
+        Buttons[13] = Button(bg="Pink", text=color_status[13], anchor=SW, command=lambda:(buy_color("Pink", 13)), font=("Impact", 12))
+        Buttons[13].place(x=260, y=480, width=100, height=100)
+        Buttons[14] = Button(bg="White", text=color_status[14], anchor=SW, command=lambda:(buy_color("White", 14)), font=("Impact", 12))
+        Buttons[14].place(x=260, y=600, width=100, height=100)
 def buy_color(color, position):
     global balance, nomoney_status, Buttons
     open_colors = open('resources\\colors.txt', 'r')
@@ -455,7 +469,7 @@ def buy_color(color, position):
             cnvs.delete("all")
             for i in range(len(Buttons)):
                 Buttons[i].destroy()
-            shop()
+            shop("a")
         else:
             if nomoney_status == False:
                 no_money()
@@ -472,7 +486,7 @@ def buy_color(color, position):
         cnvs.delete("all")
         for i in range(len(Buttons)):
             Buttons[i].destroy()
-        shop()
+        shop("a")
         
 def no_money():
     global e, nomoney_text, nomoney_status, cnvs
@@ -487,11 +501,39 @@ def no_money():
     nomoney_text = Label(text="Недостаточно средств", fg="red", font=("Impact", 25))
     nomoney_text.place(x=150, y=730)
     tk.after(1000, no_money)
-def x(event):
-    global game
-    cnvs.delete("all")
-    game = False
-    shop()
+def pause(event):
+    global game, pause_button, help_status
+    if game == False and help_status == False:
+        game = True
+        cnvs.delete(pause_button)
+        pause_button = cnvs.create_image(50, 50, image=pause_image)
+        brevno1()
+        brevno2()
+        brevno3()
+        check()
+    elif game == True:
+        game = False
+        cnvs.delete(pause_button)
+        pause_button = cnvs.create_image(50, 50, image=continue_image)
+    cnvs.tag_bind(pause_button, '<Button-1>', pause)
+def help(event):
+    global game, cnvs2, rules_image, close_button, help_status
+    if help_status == False:
+        help_status = True
+        game = False
+        cnvs2 = Canvas(highlightbackground="black")
+        cnvs2.place(x=150, y=150, height=600, width=400)
+        cnvs2.create_image(200, 300, image=rules_image)
+        close_button = Button(bg="Red", text="Ок", command=lambda:(cnvs2.destroy(), close_button.destroy(), close_help()), font=("Impact", 25))
+        close_button.place(x=300, y=670, width=100, height=50)
+def close_help():
+    global game, help_status
+    game = True
+    brevno1()
+    brevno2()
+    brevno3()
+    check()
+    help_status = False
 def key(event):
     if game == True:
         if event.keycode == 87:
@@ -504,17 +546,6 @@ def key(event):
             press_s(event)
         if event.keycode == 81:
             jump(event)
-    if event.keycode == 88:
-            x(event)
-    
-tk.bind('<Key>', key)
-tk.bind('<Key>', key)
-tk.bind('<Key>', key)
-tk.bind('<Key>', key)
-tk.bind('<Key>', key)
 tk.bind('<Key>', key)
 restart()
 mainloop()
-
-
-
