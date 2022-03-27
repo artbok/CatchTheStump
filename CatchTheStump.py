@@ -8,7 +8,7 @@ tk.resizable(width=False, height=False)
 tk.title("Убеги от пенька")
 tk.config(cursor="plus")
 tk.iconbitmap("images\\icon.ico")
-objects = ["", "", "", ""]
+objects = [" ", " ", " ", " "]
 e = 0
 b2 = 0
 b3 = 0
@@ -25,12 +25,14 @@ game = True
 help_status = False
 nomoney_status = False
 time = 0
+dislikes = [" ", " ", " "]
 monetka = []
 deaths = 0
 coins_received = 0
 balance = 0
+number = None
 def restart():
-    global jump_cooldown, player, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
+    global jump_cooldown, player, dislike_image, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
     game = True
     deaths = 0
     monetka = []
@@ -73,6 +75,7 @@ def restart():
     rules_image = PhotoImage(file="images\\rules.png")
     shop_image = PhotoImage(file="images\\shop.png")
     continue_image = PhotoImage(file="images\\continue.png")
+    dislike_image = PhotoImage(file="images\\happy.png")
     cnvs.create_image(640, 40, image=deaths_image)
     cnvs.create_image(540, 40, image=coin_image)
     cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
@@ -219,7 +222,7 @@ def d_cd():
         return
     tk.after(120, d_cd)
 def brevno1():
-    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1
+    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1, number, dislikes
     if game == True:
         if brevno_status1 == False:
             a1 = random.randint(x1-200, x1+200)
@@ -234,10 +237,15 @@ def brevno1():
             if b1 < 800: 
                 cnvs.move(objects[1], 0, 12)
                 b1 += 12
+                if number == 0:
+                    cnvs.move(dislikes[0], 0, 12)
             else:
                 cnvs.delete(objects[1])
                 objects[1] = "" 
                 brevno_status1 = False
+                if number == 0:
+                    cnvs.delete(dislikes[0])
+                    dislikes[0] = " "
         tk.after(60, brevno1)
     else:
         tk.after_cancel(brevno1)
@@ -257,10 +265,15 @@ def brevno2():
             if b2 < 800: 
                 cnvs.move(objects[2], 0, 12)
                 b2 += 12
+                if number == 1:
+                    cnvs.move(dislikes[1], 0, 12)
             else:
                 cnvs.delete(objects[2])
                 objects[2] = "" 
                 brevno_status2 = False
+                if number == 1:
+                    cnvs.delete(dislikes[1])
+                    dislikes[1] = " "
         tk.after(60, brevno2)
     else:
         tk.after_cancel(brevno2)
@@ -280,10 +293,15 @@ def brevno3():
             if b3 < 800: 
                 cnvs.move(objects[3], 0, 12)
                 b3 += 12  
+                if number == 2:
+                    cnvs.move(dislikes[2], 0, 12)
             else:
                 cnvs.delete(objects[3])
                 objects[3] = "" 
                 brevno_status3 = False 
+                if number == 2:
+                    cnvs.delete(dislikes[2])
+                    dislikes[2] = " "
         tk.after(60, brevno3)
     else:
         tk.after_cancel(brevno3)
@@ -319,21 +337,29 @@ def check():
             player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
+            dis(2, a3, b3)
         if b2 == y1 and x1 >= a2-100 and x1 <= a2+100:
             deaths += 1
             cnvs.delete(player)
             player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
+            dis(1, a2, b2)
         if b1 == y1 and x1 >= a1-100 and x1 <= a1+100:
             deaths += 1
             cnvs.delete(player)
             player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
+            dis(0, a1, b1)
         tk.after(1, check)
     else:
         tk.after_cancel(check)
+def dis(numb, x, y):
+    global dislikes, number
+    if dislikes[numb] == " ":
+        dislikes[numb] = cnvs.create_image(x+60, y-55, image=dislike_image)
+        number = numb
 def coins():
     global monetka, v1, v2
     for i in range(7):
