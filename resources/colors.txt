@@ -1,20 +1,22 @@
-Pink
-13
+white
+14
+no
+no
+no
+no
+no 
+no
+no
+no
+no
+no 
+no
+no
+no
+no
 yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
-yes
+
+
 
 
 
