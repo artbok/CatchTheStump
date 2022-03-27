@@ -30,7 +30,7 @@ deaths = 0
 coins_received = 0
 balance = 0
 def restart():
-    global jump_cooldown, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
+    global jump_cooldown, player, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
     game = True
     deaths = 0
     monetka = []
@@ -86,10 +86,10 @@ def restart():
     cnvs.tag_bind(help_button, '<Button-1>', help)
     shop_button = cnvs.create_image(210, 50, image=shop_image)
     cnvs.tag_bind(shop_button, '<Button-1>', shop)
-    objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
-    #brevno1()
-    #brevno2()
-    #brevno3()
+    player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+    brevno1()
+    brevno2()
+    brevno3()
     coins()
     gen_bomba()
     check()
@@ -110,7 +110,7 @@ def press_w(event):
             menu()
         if not w_cooldown:
             y1 = y1 - 12
-            cnvs.move(objects[0], 0, -12)
+            cnvs.move(player, 0, -12)
             w_cd()
 def press_s(event):
     global s_cooldown, x1, y1
@@ -118,7 +118,7 @@ def press_s(event):
         if y1 < 770:
             if not s_cooldown:
                 y1 = y1 + 12
-                cnvs.move(objects[0], 0, 12)
+                cnvs.move(player, 0, 12)
                 s_cd()
 def press_a(event):
     global a_cooldown, x1, y1
@@ -126,7 +126,7 @@ def press_a(event):
         if x1 > 30:   
             if not a_cooldown:
                 x1 = x1 - 12
-                cnvs.move(objects[0], -12, 0)
+                cnvs.move(player, -12, 0)
                 a_cd()
 def press_d(event):
     global d_cooldown, x1, y1
@@ -134,14 +134,14 @@ def press_d(event):
         if x1 < 670:
             if not d_cooldown:
                 x1 = x1 + 12
-                cnvs.move(objects[0], 12, 0)
+                cnvs.move(player, 12, 0)
                 d_cd()
 def jump(event):
     global jump_cooldown, x1, y1, lines, cnvs, game, balance, total_deaths
     if game == True:
         if not jump_cooldown:
             y1 = y1 - 108
-            cnvs.move(objects[0], 0,-108)
+            cnvs.move(player, 0,-108)
             cd2()
             if y1 < 100:
                 balance += 10
@@ -167,7 +167,7 @@ def cd2():
         if jump_cooldown == 1:
             cnvs.delete(cd_status_image)
             cd_status_image = cnvs.create_image(490, 40, image=cd_image)
-        if jump_cooldown == 100:
+        if jump_cooldown == 80:
             jump_cooldown = None
             cnvs.delete(cd_status_image)
             cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
@@ -184,7 +184,7 @@ def wait_jump():
         tk.after_cancel(wait_jump)
         jump_text_cooldown = None
         return
-    jump_text = cnvs.create_text(350, 750, text=("Подождите " + str(10-(jump_cooldown//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
+    jump_text = cnvs.create_text(350, 750, text=("Подождите " + str(8-(jump_cooldown//10)) + " сек. перед следующим использованием"), fill="red", font=("Impact", 15))
     tk.after(1000, wait_jump)
 def w_cd():
     global w_cooldown, x1, y1
@@ -289,7 +289,7 @@ def brevno3():
         tk.after_cancel(brevno3)
 
 def check():
-    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1, deaths, monetka, balance, v1, v2, time, coins_received
+    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1, deaths, monetka, balance, v1, v2, time, coins_received, player
     if game == True:
         death_text.configure(text=deaths)
         money_text.configure(text=balance)
@@ -303,32 +303,32 @@ def check():
                 balance += 1
                 coins_received += 1
         for e in range(0, len(bomba)):
-            if bombs2[e-1]+60 >= x1 and bombs2[e-1]-60 <= x1 and bombs1[e-1]+60 >= y1 and bombs1[e-1]-60 <= y1:
+            if bombs1[e-1]+60 >= x1 and bombs1[e-1]-60 <= x1 and bombs2[e-1]+60 >= y1 and bombs2[e-1]-60 <= y1:
                 cnvs.delete(bomba[e-1])
                 bomba.pop(e-1)
                 bombs2.pop(e-1)
                 bombs1.pop(e-1)
                 deaths += 1
-                cnvs.delete(objects[0])
-                objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
+                cnvs.delete(player)
+                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
                 x1 = 350
                 y1 = 840
         if b3 == y1 and x1 >= a3-100 and x1 <= a3+100:
             deaths += 1
-            cnvs.delete(objects[0])
-            objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
+            cnvs.delete(player)
+            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
         if b2 == y1 and x1 >= a2-100 and x1 <= a2+100:
             deaths += 1
-            cnvs.delete(objects[0])
-            objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
+            cnvs.delete(player)
+            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
         if b1 == y1 and x1 >= a1-100 and x1 <= a1+100:
             deaths += 1
-            cnvs.delete(objects[0])
-            objects[0] = (cnvs.create_oval(330, 820, 370, 860, fill="blue", width=3))
+            cnvs.delete(player)
+            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
             x1 = 350
             y1 = 840
         tk.after(1, check)
@@ -349,15 +349,15 @@ def coins():
 def gen_bomba():
     global bomba, bombs1, bombs2
     for i in range(2):
-        a = random.randint(200, 600)
+        a = random.randint(40, 660)
         a = a - a % 20 - 10
         bombs1.append(a)
     for j in range(2):
-        a = random.randint(40, 660)
+        a = random.randint(200, 600)
         a = a - a % 20 - 10
         bombs2.append(a)
-    bomba.append(cnvs.create_image(bombs2[0], bombs1[0], image=bomba_image))
-    bomba.append(cnvs.create_image(bombs2[1], bombs1[1], image=bomba_image))
+    bomba.append(cnvs.create_image(bombs1[0], bombs2[0], image=bomba_image))
+    bomba.append(cnvs.create_image(bombs1[1], bombs2[1], image=bomba_image))
 def menu():
     global deaths, balance, coins_received, total_deaths
     total_deaths += deaths
