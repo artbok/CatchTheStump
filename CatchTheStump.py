@@ -358,7 +358,7 @@ def check():
             shield_status = True
             shield_pos = [5000, 50000]
             cnvs.delete(shield_object)
-            shield_object = (cnvs.create_oval(x1+30, y1+30, x1-30, y1-30, width=2))
+            shield_object = (cnvs.create_oval(x1+30, y1+30, x1-30, y1-30, outline="light blue", width=2))
         if b3 == y1 and x1 >= a3-100 and x1 <= a3+100:
             if shield_status == True:
                 shield_status = False
