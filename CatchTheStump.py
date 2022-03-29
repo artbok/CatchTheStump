@@ -32,7 +32,7 @@ coins_received = 0
 balance = 0
 number = None
 def restart():
-    global jump_cooldown, player, dislike_image, pause_image, continue_image, rules_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
+    global jump_cooldown, player, dislike_image, pause_image, continue_image, shield_status, shield_pos, rules_image, shield_image, help_image, shop_button, help_button, shop_image, pause_button, bombs1, bombs2, bomba, bomba_image, brevno_status1, brevno_status2, brevno_status3, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, shop_lines, game, deaths, total_deaths, x1, y1, monetka, coins_received, v1, v2
     game = True
     deaths = 0
     monetka = []
@@ -43,19 +43,21 @@ def restart():
     bombs1 = []
     bombs2 = []
     bomba = []
+    shield_pos = []
     jump_cooldown = None
     coins_received = 0
     brevno_status1 = False
     brevno_status2 = False
     brevno_status3 = False
+    shield_status = False
     open_settings = open('resources\\settings.txt', 'r')
-    lines = open_settings.readlines()
+    shop_lines = open_settings.readlines()
     open_settings.close()
-    balance = int(lines[0])
-    total_deaths = int(lines[1])
+    balance = int(shop_lines[0])
+    total_deaths = int(shop_lines[1])
     open_colors = open('resources\\colors.txt', 'r')
-    lines = open_colors.readlines()
-    color = lines[0]
+    shop_lines = open_colors.readlines()
+    color = shop_lines[0]
     color = color[:-1]
     open_colors.close()
     if balance > 999:
@@ -75,7 +77,8 @@ def restart():
     rules_image = PhotoImage(file="images\\rules.png")
     shop_image = PhotoImage(file="images\\shop.png")
     continue_image = PhotoImage(file="images\\continue.png")
-    dislike_image = PhotoImage(file="images\\happy.png")
+    dislike_image = PhotoImage(file="images\\dislike.png")
+    shield_image = PhotoImage(file="images\\shield.png")
     cnvs.create_image(640, 40, image=deaths_image)
     cnvs.create_image(540, 40, image=coin_image)
     cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
@@ -93,18 +96,19 @@ def restart():
     brevno1()
     brevno2()
     brevno3()
+    shield()
     coins()
     gen_bomba()
     check()
 def press_w(event):
-    global w_cooldown, x1, y1, lines, cnvs, game, balance, total_deaths
+    global w_cooldown, x1, y1, shop_lines, cnvs, game, balance, total_deaths, shield_object
     if game == True:
         if y1 < 100:
             balance += 10
             balance = balance - deaths // 2
-            lines = str(balance), "\n", str(deaths + total_deaths)
+            shop_lines = str(balance), "\n", str(deaths + total_deaths)
             save_settings = open('resources\\settings.txt', 'w')
-            save_settings.writelines(lines)
+            save_settings.writelines(shop_lines)
             save_settings.close()
             cnvs.delete("all")
             death_text.destroy()
@@ -114,7 +118,11 @@ def press_w(event):
         if not w_cooldown:
             y1 = y1 - 12
             cnvs.move(player, 0, -12)
+            if shield_status == True:
+                print(shield_status)
+                cnvs.move(shield_object, 0, -12)
             w_cd()
+
 def press_s(event):
     global s_cooldown, x1, y1
     if game == True:
@@ -122,6 +130,8 @@ def press_s(event):
             if not s_cooldown:
                 y1 = y1 + 12
                 cnvs.move(player, 0, 12)
+                if shield_status == True:
+                    cnvs.move(shield_object, 0, 12)
                 s_cd()
 def press_a(event):
     global a_cooldown, x1, y1
@@ -130,6 +140,8 @@ def press_a(event):
             if not a_cooldown:
                 x1 = x1 - 12
                 cnvs.move(player, -12, 0)
+                if shield_status == True:
+                    cnvs.move(shield_object, -12, 0)
                 a_cd()
 def press_d(event):
     global d_cooldown, x1, y1
@@ -138,26 +150,30 @@ def press_d(event):
             if not d_cooldown:
                 x1 = x1 + 12
                 cnvs.move(player, 12, 0)
+                if shield_status == True:
+                    cnvs.move(shield_object, 12, 0)
                 d_cd()
 def jump(event):
-    global jump_cooldown, x1, y1, lines, cnvs, game, balance, total_deaths
+    global jump_cooldown, x1, y1, shop_lines, cnvs, game, balance, total_deaths
     if game == True:
         if not jump_cooldown:
             y1 = y1 - 108
             cnvs.move(player, 0,-108)
-            cd2()
+            if shield_status == True:
+                    cnvs.move(shield_object, 0, -108)
             if y1 < 100:
                 balance += 10
                 balance = balance - deaths // 2
-                lines = str(balance), "\n", str(deaths + total_deaths)
+                shop_lines = str(balance), "\n", str(deaths + total_deaths)
                 save_settings = open('resources\\settings.txt', 'w')
-                save_settings.writelines(lines)
+                save_settings.writelines(shop_lines)
                 save_settings.close()
                 cnvs.delete("all")
                 death_text.destroy()
                 money_text.destroy()
                 game = False
                 menu()
+            cd2()
         else:
             if not jump_text_cooldown:
                 wait_jump()
@@ -307,7 +323,7 @@ def brevno3():
         tk.after_cancel(brevno3)
 
 def check():
-    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1, deaths, monetka, balance, v1, v2, time, coins_received, player
+    global brevno_status1, brevno_status2, brevno_status3, a1, a2, a3, b1, b2, b3, x1, y1, deaths, monetka, balance, v1, v2, time, coins_received, player, shield_status, shield_object, shield_pos
     if game == True:
         death_text.configure(text=deaths)
         money_text.configure(text=balance)
@@ -322,37 +338,61 @@ def check():
                 coins_received += 1
         for e in range(0, len(bomba)):
             if bombs1[e-1]+60 >= x1 and bombs1[e-1]-60 <= x1 and bombs2[e-1]+60 >= y1 and bombs2[e-1]-60 <= y1:
-                cnvs.delete(bomba[e-1])
-                bomba.pop(e-1)
-                bombs2.pop(e-1)
-                bombs1.pop(e-1)
+                if shield_status == True:
+                    shield_status = False
+                    cnvs.delete(shield_object)
+                    bomba.pop(e-1)
+                    bombs2.pop(e-1)
+                    bombs1.pop(e-1)
+                else:
+                    cnvs.delete(bomba[e-1])
+                    bomba.pop(e-1)
+                    bombs2.pop(e-1)
+                    bombs1.pop(e-1)
+                    deaths += 1
+                    cnvs.delete(player)
+                    player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                    x1 = 350
+                    y1 = 840
+        if shield_pos[0]+60 >= x1 and shield_pos[0]-60 <= x1 and shield_pos[1]+60 >= y1 and shield_pos[1]-60 <= y1:
+            shield_status = True
+            shield_pos = [5000, 50000]
+            cnvs.delete(shield_object)
+            shield_object = (cnvs.create_oval(x1+30, y1+30, x1-30, y1-30, width=2))
+        if b3 == y1 and x1 >= a3-100 and x1 <= a3+100:
+            if shield_status == True:
+                shield_status = False
+                cnvs.delete(shield_object)
+            else:
                 deaths += 1
                 cnvs.delete(player)
                 player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
                 x1 = 350
                 y1 = 840
-        if b3 == y1 and x1 >= a3-100 and x1 <= a3+100:
-            deaths += 1
-            cnvs.delete(player)
-            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-            x1 = 350
-            y1 = 840
-            dis(2, a3, b3)
+                dis(2, a3, b3)
         if b2 == y1 and x1 >= a2-100 and x1 <= a2+100:
-            deaths += 1
-            cnvs.delete(player)
-            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-            x1 = 350
-            y1 = 840
-            dis(1, a2, b2)
+            if shield_status == True:
+                shield_status = False
+                cnvs.delete(shield_object)
+            else:
+                deaths += 1
+                cnvs.delete(player)
+                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                x1 = 350
+                y1 = 840
+                dis(1, a2, b2)
         if b1 == y1 and x1 >= a1-100 and x1 <= a1+100:
-            deaths += 1
-            cnvs.delete(player)
-            player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-            x1 = 350
-            y1 = 840
-            dis(0, a1, b1)
-        tk.after(1, check)
+            if shield_status == True:
+                shield_status = False
+                cnvs.delete(shield_object)
+            else:
+                deaths += 1
+                cnvs.delete(player)
+                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                x1 = 350
+                y1 = 840
+                dis(0, a1, b1)
+        tk.after(60, check)
     else:
         tk.after_cancel(check)
 def dis(numb, x, y):
@@ -376,11 +416,11 @@ def gen_bomba():
     global bomba, bombs1, bombs2
     for i in range(2):
         a = random.randint(40, 660)
-        a = a - a % 20 - 10
+        a = a - a % 12
         bombs1.append(a)
     for j in range(2):
         a = random.randint(200, 600)
-        a = a - a % 20 - 10
+        a = a - a % 12
         bombs2.append(a)
     bomba.append(cnvs.create_image(bombs1[0], bombs2[0], image=bomba_image))
     bomba.append(cnvs.create_image(bombs1[1], bombs2[1], image=bomba_image))
@@ -414,14 +454,14 @@ def shop(event):
         money_text.place(x=620, y=40)
         color_status = []
         open_colors = open('resources\\colors.txt', 'r')
-        lines = open_colors.readlines()
+        shop_lines = open_colors.readlines()
         open_colors.close()
-        for i in range(len(lines)):
-            if lines[i] == "yes\n":
+        for i in range(len(shop_lines)):
+            if shop_lines[i] == "yes\n":
                 color_status.append("Выбрать")
-            elif lines[i] == "no\n" or lines[i] == "no":
+            elif shop_lines[i] == "no\n" or shop_lines[i] == "no":
                 color_status.append("Купить")
-        selected = int(lines[1])
+        selected = int(shop_lines[1])
         color_status[selected] = "Выбрано"
         text = Label(text="Магазин", font=("Impact", 50))
         text.place(x=10, y=20)
@@ -458,39 +498,41 @@ def shop(event):
         Buttons[13].place(x=260, y=480, width=100, height=100)
         Buttons[14] = Button(bg="White", text=color_status[14], anchor=SW, command=lambda:(buy_color("White", 14)), font=("Impact", 12))
         Buttons[14].place(x=260, y=600, width=100, height=100)
+def shield():
+    global shield_pos, shield_object
+    shield_pos = []
+    a = random.randint(60, 660)
+    a = a - a % 12
+    shield_pos.append(a)
+    a = random.randint(200, 600)
+    a = a - a % 12
+    shield_pos.append(a)
+    shield_object = cnvs.create_image(shield_pos[0], shield_pos[1], image=shield_image)
+    
 def buy_color(color, position):
     global balance, nomoney_status, Buttons
-    open_colors = open('resources\\colors.txt', 'r')
-    lines = open_colors.readlines()
-    open_colors.close()
-    for i in range(2, len(lines)):
-        line = lines[i]
-        lines[i] = line[:-1]
-    if lines[position+2] == "no":
+    open_file = open('resources\\colors.txt', 'r')
+    shop_lines = open_file.readlines()
+    print(shop_lines)
+    for i in range(len(shop_lines)):
+        line = shop_lines[i]
+        shop_lines[i] = line[:-1]
+    if shop_lines[position+2] == "no":
         if balance >= 10:
             balance = balance - 10
-            lines[position+2] = "yes"
-            for i in range(2, len(lines)):
-                line = lines[i]
-                lines[i] = line + "\n"
-            lines.append("\n")
+            shop_lines[position+2] = "yes"
+            for i in range(2, len(shop_lines)):
+                line = shop_lines[i]
+                shop_lines[i] = line + "\n"
+            shop_lines[0] = color + "\n"
+            shop_lines[1] = str(position) + "\n"
+            shop_lines.append("\n")
             open_colors = open('resources\\colors.txt', 'w')
-            open_colors.writelines(lines)
+            open_colors.writelines(shop_lines)
             open_colors.close()
-            open_colors = open('resources\\settings.txt', 'r')
-            lines = open_colors.readlines()
-            open_colors.close()
-            lines[0] = str(balance) + "\n"
+            shop_lines = [(str(balance) + "\n"),  (str(total_deaths) + "\n")]
             open_colors = open('resources\\settings.txt', 'w')
-            open_colors.writelines(lines)
-            open_colors.close()
-            open_colors = open('resources\\colors.txt', 'r')
-            lines = open_colors.readlines()
-            open_colors.close()
-            open_colors = open('resources\\colors.txt', 'w')
-            lines[0] = color + "\n"
-            lines[1] = str(position) + "\n"
-            open_colors.writelines(lines)
+            open_colors.writelines(shop_lines)
             open_colors.close()
             cnvs.delete("all")
             for i in range(len(Buttons)):
@@ -501,13 +543,10 @@ def buy_color(color, position):
                 no_money()
                 return
     else:
-        open_colors = open('resources\\colors.txt', 'r')
-        lines = open_colors.readlines()
-        open_colors.close()
         open_colors = open('resources\\colors.txt', 'w')
-        lines[0] = color + "\n"
-        lines[1] = str(position) + "\n"
-        open_colors.writelines(lines)
+        shop_lines[0] = color + "\n"
+        shop_lines[1] = str(position) + "\n"
+        open_colors.writelines(shop_lines)
         open_colors.close()
         cnvs.delete("all")
         for i in range(len(Buttons)):
