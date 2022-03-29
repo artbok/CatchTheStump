@@ -1,5 +1,11 @@
-turquoise
-8
+white
+14
+no
+no
+no
+no
+no
+no
 no
 no
 no
@@ -9,11 +15,3 @@ no
 no
 no
 yes
-no
-no
-no
-no
-yes
-yes
-
-

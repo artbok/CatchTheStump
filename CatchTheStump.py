@@ -94,8 +94,8 @@ def restart():
     cnvs.tag_bind(shop_button, '<Button-1>', shop)
     player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
     brevno1()
-    brevno2()
-    brevno3()
+    #brevno2()
+    #brevno3()
     shield()
     coins()
     gen_bomba()
@@ -119,7 +119,6 @@ def press_w(event):
             y1 = y1 - 12
             cnvs.move(player, 0, -12)
             if shield_status == True:
-                print(shield_status)
                 cnvs.move(shield_object, 0, -12)
             w_cd()
 
@@ -341,6 +340,7 @@ def check():
                 if shield_status == True:
                     shield_status = False
                     cnvs.delete(shield_object)
+                    cnvs.delete(bomba[e-1])
                     bomba.pop(e-1)
                     bombs2.pop(e-1)
                     bombs1.pop(e-1)
@@ -358,7 +358,7 @@ def check():
             shield_status = True
             shield_pos = [5000, 50000]
             cnvs.delete(shield_object)
-            shield_object = (cnvs.create_oval(x1+30, y1+30, x1-30, y1-30, outline="light blue", width=2))
+            shield_object = (cnvs.create_oval(x1+30, y1+30, x1-30, y1-30, outline="red", width=3))
         if b3 == y1 and x1 >= a3-100 and x1 <= a3+100:
             if shield_status == True:
                 shield_status = False
@@ -544,6 +544,9 @@ def buy_color(color, position):
                 return
     else:
         open_colors = open('resources\\colors.txt', 'w')
+        for i in range(2, len(shop_lines)):
+            line = shop_lines[i]
+            shop_lines[i] = line + "\n"
         shop_lines[0] = color + "\n"
         shop_lines[1] = str(position) + "\n"
         open_colors.writelines(shop_lines)
