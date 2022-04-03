@@ -1,6 +1,26 @@
 from tkinter import *
 import random
 import os
+
+class Player:
+    x = 350 
+    y = 840
+    obj = None
+
+class Brevno:
+    x = 0
+    y = 96
+    status = False
+    obj = None
+
+    def initXY(self, player: Player):
+        self.x = random.randint(player.x-150, player.x+150)
+        self.y = 96
+
+
+class coins:
+    x = []
+    y = []
 tk = Tk()
 geometry = str(700) + "x" + str(900) + "+" + str((tk.winfo_screenwidth()//2) - 350) + "+" + str(tk.winfo_screenheight()-980)
 tk.geometry(geometry)
@@ -11,8 +31,13 @@ tk.iconbitmap("images\\icon.ico")
 stumps = [" ", " "]
 e = 0
 h = 0
-brevno2_y = 0
-brevno1_y = 0
+
+player = Player()
+
+brevna = [Brevno(), Brevno()]
+brevno1 = brevna[0]
+brevno2 = brevna[1]
+
 brevno_image = PhotoImage(file='images\\stump.png')
 deaths_image = PhotoImage(file='images\\death.png')
 coin_image = PhotoImage(file="images\\coin.png")
@@ -45,12 +70,10 @@ coins_received = 0
 balance = 0
 number = None
 def restart():
-    global jump_cooldown, player, emotions, pause_image, continue_image, shield_status, shield_pos, rules_image, shield_image, help_image, shop_button, help_button, shop_image, pause_button, bombs_x, bombs_y, bombs_objects, bomb_image, brevno1_status, brevno2_status, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, objects, shop_lines, game, deaths, total_deaths, player_x, player_y, coins_objects, coins_received, coins_x, coins_y
+    global jump_cooldown, player, emotions, pause_image, continue_image, shield_status, shield_pos, rules_image, shield_image, help_image, shop_button, help_button, shop_image, pause_button, bombs_x, bombs_y, bombs_objects, bomb_image, brevno1, brevno2, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, shop_lines, game, deaths, total_deaths, coins_objects, coins_received, coins_x, coins_y
     game = True
     deaths = 0
     coins_objects = []
-    player_x = 350 
-    player_y = 840
     coins_x = []
     coins_y = []
     bombs_x = []
@@ -59,8 +82,8 @@ def restart():
     shield_pos = []
     jump_cooldown = None
     coins_received = 0
-    brevno1_status = False
-    brevno2_status = False
+    brevno1.status = False
+    brevno2.status = False
     shield_status = False
     open_settings = open('resources\\settings.txt', 'r')
     shop_lines = open_settings.readlines()
@@ -84,31 +107,31 @@ def restart():
     death_text = cnvs.create_text(670, 40, text=deaths, font=("Impact", 25))
     money_text = cnvs.create_text(590, 40, text=balance, font=("Impact", 25))
     pause_button = cnvs.create_image(50, 50, image=pause_image)
-    cnvs.tag_bind(pause_button, '<Button-1>', pause)
+    cnvs.tag_bind(pause_button, '<Button-1>', pause)a
     help_button = cnvs.create_image(130, 50, image=help_image)
     cnvs.tag_bind(help_button, '<Button-1>', help)
     shop_button = cnvs.create_image(210, 50, image=shop_image)
     cnvs.tag_bind(shop_button, '<Button-1>', shop)
-    player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-    brevno1()
-    brevno2()
+    player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+    fbrevno1()
+    fbrevno2()
     meterorit()
     shield()
-    coins()
+    gen_coins()
     bomba()
     check()
 
 def press_w(event):
-    global w_cooldown, player_x, player_y, shop_lines, cnvs, game, balance, total_deaths, shield_object
+    global w_cooldown, player, shop_lines, cnvs, game, balance, total_deaths, shield_object
     if game == True and not w_cooldown:
-        player_y = player_y - 12
-        cnvs.move(player, 0, -12)
+        player.y = player.y - 12
+        cnvs.move(player.obj, 0, -12)
         if shield_status == True:
             cnvs.move(shield_object, 0, -12)
         check()
         w_cd()
 def w_cd():
-    global w_cooldown, player_x, player_y
+    global w_cooldown, player
     w_cooldown = 1 if not w_cooldown else w_cooldown + 1 
     if w_cooldown == 2:
         w_cooldown = None
@@ -118,16 +141,16 @@ def w_cd():
 
 
 def press_s(event):
-    global s_cooldown, player_x, player_y
-    if game == True and player_y < 770 and not s_cooldown:
-        player_y = player_y + 12
-        cnvs.move(player, 0, 12)
+    global s_cooldown, player
+    if game == True and player.y < 770 and not s_cooldown:
+        player.y = player.y + 12
+        cnvs.move(player.obj, 0, 12)
         if shield_status == True:
             cnvs.move(shield_object, 0, 12)
         check()
         s_cd()
 def s_cd():
-    global s_cooldown, player_x, player_y
+    global s_cooldown, player
     s_cooldown = 1 if not s_cooldown else s_cooldown + 1 
     if s_cooldown == 2:
         s_cooldown = None
@@ -137,16 +160,16 @@ def s_cd():
 
 
 def press_a(event):
-    global a_cooldown, player_x, player_y
-    if game == True and player_x > 30 and not a_cooldown:
-        player_x = player_x - 12
-        cnvs.move(player, -12, 0)
+    global a_cooldown, player
+    if game == True and player.x > 30 and not a_cooldown:
+        player.x = player.x - 12
+        cnvs.move(player.obj, -12, 0)
         if shield_status == True:
             cnvs.move(shield_object, -12, 0)
         check()
         a_cd()
 def a_cd():
-    global a_cooldown, player_x, player_y
+    global a_cooldown, player
     a_cooldown = 1 if not a_cooldown else a_cooldown + 1 
     if a_cooldown == 2:
         a_cooldown = None
@@ -156,16 +179,16 @@ def a_cd():
 
 
 def press_d(event):
-    global d_cooldown, player_x, player_y
-    if game == True and player_x < 670 and not d_cooldown:
-        player_x = player_x + 12
-        cnvs.move(player, 12, 0)
+    global d_cooldown, player
+    if game == True and player.x < 670 and not d_cooldown:
+        player.x = player.x + 12
+        cnvs.move(player.obj, 12, 0)
         if shield_status == True:
             cnvs.move(shield_object, 12, 0)
         check()
         d_cd()
 def d_cd():
-    global d_cooldown, player_x, player_y
+    global d_cooldown, player
     d_cooldown = 1 if not d_cooldown else d_cooldown + 1 
     if d_cooldown == 2:
         d_cooldown = None
@@ -175,11 +198,11 @@ def d_cd():
 
 
 def jump(event):
-    global jump_cooldown, player_x, player_y, shop_lines, cnvs, game, balance, total_deaths
+    global jump_cooldown, player, shop_lines, cnvs, game, balance, total_deaths
     if game == True:
         if not jump_cooldown:
-            player_y = player_y - 108
-            cnvs.move(player, 0,-108)
+            player.y = player.y - 108
+            cnvs.move(player.obj, 0,-108)
             if shield_status == True:
                     cnvs.move(shield_object, 0, -108)
             check()
@@ -217,71 +240,71 @@ def wait_jump():
     tk.after(1000, wait_jump)
 
 
-def brevno1():
-    global brevno1_status, brevno2_status, brevno1_x, brevno2_x, brevno1_y, brevno2_y, player_x, player_y, number, dislikes
+def fbrevno1():
+    global brevno1, brevno2, player, number, dislikes
     if game == True:
-        if brevno1_status == False:
-            brevno1_x = random.randint(player_x-150, player_x+150)
-            if brevno1_x < 100:
-                brevno1_x = 100
-            if brevno1_x > 600:
-                brevno1_x = 600
-            brevno1_y = 96
-            brevno1_status = True
-            stumps[0] = (cnvs.create_image(brevno1_x, 96, image=brevno_image))
-        elif brevno1_status != False:
-            if brevno1_y < 800: 
+        if brevno1.status == False:
+            brevno1.initXY(player)
+            if brevno1.x < 100:
+                brevno1.x = 100
+            if brevno1.x > 600:
+                brevno1.x = 600
+            brevno1.y = 96
+            brevno1.status = True
+            stumps[0] = (cnvs.create_image(brevno1.x, 96, image=brevno_image))
+        elif brevno1.status != False:
+            if brevno1.y < 800: 
                 cnvs.move(stumps[0], 0, 12)
-                brevno1_y += 12
+                brevno1.y += 12
                 check()
                 if number == 0:
                     cnvs.move(dislikes[0], 0, 12)
             else:
                 cnvs.delete(stumps[0])
                 stumps[0] = "" 
-                brevno1_status = False
+                brevno1.status = False
                 if number == 0:
                     cnvs.delete(dislikes[0])
                     dislikes[0] = " "
-        tk.after(50, brevno1)
+        tk.after(50, fbrevno1)
     else:
-        tk.after_cancel(brevno1)
-def brevno2():
-    global brevno1_status, brevno2_status, brevno1_x, brevno2_x, brevno1_y, brevno2_y, player_x, player_y
+        tk.after_cancel(fbrevno1)
+def fbrevno2():
+    global brevno1, brevno2, player
     if game == True:
-        if brevno2_status == False and brevno1_y >= 450:
-            brevno2_x = random.randint(player_x-150, player_x+150)
-            brevno2_y = 96
-            if brevno2_x < 100:
-                brevno2_x = 100
-            if brevno2_x > 600:
-                brevno2_x = 600
-            brevno2_status = True
-            stumps[1] = (cnvs.create_image(brevno2_x, 96, image=brevno_image))
-        elif brevno2_status != False:
-            if brevno2_y < 800: 
+        if brevno2.status == False and brevno1.y >= 450:
+            brevno2.initXY(player)
+
+            if brevno2.x < 100:
+                brevno2.x = 100
+            if brevno2.x > 600:
+                brevno2.x = 600
+            brevno2.status = True
+            stumps[1] = (cnvs.create_image(brevno2.x, 96, image=brevno_image))
+        elif brevno2.status != False:
+            if brevno2.y < 800: 
                 cnvs.move(stumps[1], 0, 12)
-                brevno2_y += 12
+                brevno2.y += 12
                 check()
                 if number == 1:
                     cnvs.move(dislikes[1], 0, 12)
             else:
                 cnvs.delete(stumps[1])
                 stumps[1] = "" 
-                brevno2_status = False
+                brevno2.status = False
                 if number == 1:
                     cnvs.delete(dislikes[1])
                     dislikes[1] = " "
-        tk.after(50, brevno2)
+        tk.after(50, fbrevno2)
     else:
-        tk.after_cancel(brevno2)
+        tk.after_cancel(fbrevno2)
 
 def check():
-    global brevno1_status, brevno2_status, brevno1_x, brevno2_x, brevno1_y, brevno2_y, player_x, player_y, deaths, coins_objects, balance, coins_x, coins_y, coins_received, player, shield_status, shield_object, shield_pos, game
+    global brevno1, brevno2, player, deaths, coins_objects, balance, coins_x, coins_y, coins_received, player, shield_status, shield_object, shield_pos, game
     if game == True:
         cnvs.itemconfig(death_text, text=deaths)
         cnvs.itemconfig(money_text, text=balance)
-        if player_y < 100:
+        if player.y < 100:
             balance += 10
             balance = balance - deaths // 2
             shop_lines = str(balance), "\n", str(deaths + total_deaths)
@@ -294,7 +317,7 @@ def check():
             game = False
             menu()
         for s in range(0, len(coins_objects)):
-            if coins_x[s-1]+24 >= player_x and coins_x[s-1]-24 <= player_x and coins_y[s-1]+24 >= player_y and coins_y[s-1]-24 <= player_y:
+            if coins_x[s-1]+24 >= player.x and coins_x[s-1]-24 <= player.x and coins_y[s-1]+24 >= player.y and coins_y[s-1]-24 <= player.y:
                 cnvs.delete(coins_objects[s-1])
                 coins_objects.pop(s-1)
                 coins_x.pop(s-1)
@@ -302,7 +325,7 @@ def check():
                 balance += 1
                 coins_received += 1
         for e in range(0, len(bombs_objects)):
-            if bombs_x[e-1]+60 >= player_x and bombs_x[e-1]-60 <= player_x and bombs_y[e-1]+60 >= player_y and bombs_y[e-1]-60 <= player_y:
+            if bombs_x[e-1]+60 >= player.x and bombs_x[e-1]-60 <= player.x and bombs_y[e-1]+60 >= player.y and bombs_y[e-1]-60 <= player.y:
                 if shield_status == True:
                     shield_status = False
                     cnvs.delete(shield_object)
@@ -316,46 +339,46 @@ def check():
                     bombs_y.pop(e-1)
                     bombs_x.pop(e-1)
                     deaths += 1
-                    cnvs.delete(player)
-                    player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-                    player_x = 350
-                    player_y = 840
-        if shield_pos[0]+60 >= player_x and shield_pos[0]-60 <= player_x and shield_pos[1]+60 >= player_y and shield_pos[1]-60 <= player_y:
+                    cnvs.delete(player.obj)
+                    player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                    player.x = 350
+                    player.y = 840
+        if shield_pos[0]+60 >= player.x and shield_pos[0]-60 <= player.x and shield_pos[1]+60 >= player.y and shield_pos[1]-60 <= player.y:
             shield_status = True
             shield_pos = [5000, 50000]
             cnvs.delete(shield_object)
-            shield_object = (cnvs.create_oval(player_x+30, player_y+30, player_x-30, player_y-30, outline="red", width=3))
-        if brevno2_y == player_y and player_x >= brevno2_x-100 and player_x <= brevno2_x+100:
+            shield_object = (cnvs.create_oval(player.x+30, player.y+30, player.x-30, player.y-30, outline="red", width=3))
+        if brevno2.y == player.y and player.x >= brevno2.x-100 and player.x <= brevno2.x+100:
             if shield_status == True:
                 shield_status = False
                 cnvs.delete(shield_object)
-                brevno2_status = None
-            elif shield_status == False and brevno2_status:
+                brevno2.status = None
+            elif shield_status == False and brevno2.status:
                 deaths += 1
-                cnvs.delete(player)
-                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-                player_x = 350
-                player_y = 840
-                dis(1, brevno2_x, brevno2_y)
-        if brevno1_y == player_y and player_x >= brevno1_x-100 and player_x <= brevno1_x+100:
+                cnvs.delete(player.obj)
+                player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                player.x = 350
+                player.y = 840
+                dis(1, brevno2.x, brevno2.y)
+        if brevno1.y == player.y and player.x >= brevno1.x-100 and player.x <= brevno1.x+100:
             if shield_status == True:
                 shield_status = False
                 cnvs.delete(shield_object)
-                brevno1_status = None
-            elif shield_status == False and brevno1_status:
+                brevno1.status = None
+            elif shield_status == False and brevno1.status:
                 deaths += 1
-                cnvs.delete(player)
-                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-                player_x = 350
-                player_y = 840
-                dis(0, brevno1_x, brevno1_y)
+                cnvs.delete(player.obj)
+                player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                player.x = 350
+                player.y = 840
+                dis(0, brevno1.x, brevno1.y)
 def dis(numb, x, y):
     global dislikes, number
     if dislikes[numb] == " ":
         i = random.randint(1, 3)
         dislikes[numb] = cnvs.create_image(x+60, y-60, image=emotions[i])
         number = numb
-def coins():
+def gen_coins():
     global coins_objects, coins_x, coins_y
     for i in range(7):
         a = random.randint(40, 660)
@@ -465,10 +488,10 @@ def shield():
     shield_object = cnvs.create_image(shield_pos[0], shield_pos[1], image=shield_image)
 def meterorit():
     global meteorit_x, meteorit_y, killtime, player, meteorit_object
-    meteorit_x = random.randint(player_x-200, player_x+200) 
+    meteorit_x = random.randint(player.x-200, player.x+200) 
     meteorit_x = meteorit_x - meteorit_x % 12
     print(meteorit_x)
-    meteorit_y = random.randint(player_y-200, player_y+200)
+    meteorit_y = random.randint(player.y-200, player.y+200)
     meteorit_y = meteorit_y - meteorit_y % 12
     if meteorit_y < 225:
         meteorit_y = 225
@@ -480,26 +503,27 @@ def meterorit():
         meteorit_x = 675
     killtime = random.randint(15, 30)
     meteorit_object = cnvs.create_image(meteorit_x, meteorit_y, image=meterorit_image)
-    cnvs.delete(player)
-    player = (cnvs.create_oval(player_x-20, player_y-20, player_x+20, player_y+20, fill="black", width=3))
+    cnvs.delete(player.obj)
+    print(player.x, player.y)
+    player.obj = (cnvs.create_oval(player.x-20, player.y-20, player.x+20, player.y+20, fill="black", width=3))
     meteorit_timer()
     tk.after(5000, meterorit)   
 
 def meteorit_timer():
-    global h, deaths, player_x, player_y, player, shield_status
+    global h, deaths, player, shield_status
     h = h + 1
     if killtime == h:
         cnvs.delete(meteorit_object)
-        if ((meteorit_x - player_x)**2 + (meteorit_y - player_y)**2)**0.5 <= 125 and killtime == h:
+        if ((meteorit_x - player.x)**2 + (meteorit_y - player.y)**2)**0.5 <= 125 and killtime == h:
             if shield_status == True:
                 shield_status = False
                 cnvs.delete(shield_object)
             else:
                 deaths += 1
-                cnvs.delete(player)
-                player = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-                player_x = 350
-                player_y = 840
+                cnvs.delete(player.obj)
+                player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                player.x = 350
+                player.y = 840
         h = 0
         tk.after_cancel(meteorit_timer)
         return
@@ -569,8 +593,8 @@ def pause(event):
         game = True
         cnvs.delete(pause_button)
         pause_button = cnvs.create_image(50, 50, image=pause_image)
-        brevno1()
-        brevno2()
+        fbrevno1()
+        fbrevno2()
         check()
     elif game == True:
         game = False
@@ -590,8 +614,8 @@ def help(event):
 def close_help():
     global game, help_status
     game = True
-    brevno1()
-    brevno2()
+    fbrevno1()
+    fbrevno2()
     check()
     help_status = False
 def key(event):
