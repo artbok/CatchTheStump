@@ -1,5 +1,5 @@
-SlateBlue2
-10
+white
+14
 no
 no
 no
@@ -7,10 +7,10 @@ no
 no
 no
 no
-yes
 no
 no
-yes
+no
+no
 no
 no
 no
