@@ -54,27 +54,26 @@ class Shield:
     y = y - y % 12
     status = False
     obj = None
-    
 # class Meteorit:
-#     def __init__(self, player):
+#     x = 0
+#     y = 0
+#     def gen_meteorite(self, player):
 #         self.x = random.randint(player.x-200, player.x+200) 
-#         self.x = self.x - self.x % 12
+#         self.x = meteorit_x - meteorit_x % 12
 #         self.y = random.randint(player.y-200, player.y+200)
 #         self.y = self.y - self.y % 12
-#         if self.y < 225:
-#             self.y = 225
-#         if self.y > 675:
-#             self.y = 675
-#         if self.x < 125:
-#             self.x = 125
-#         if self.x > 675:
-#             self.x = 675
+#         y < 225:
+#             meteorit_y = 225
+#         if meteorit_y > 675:
+#             meteorit_y = 675
+#         if meteorit_x < 150:
+#             meteorit_x = 150
+#         if meteorit_x > 600:
+#             meteorit_x = 600
 #         killtime = random.randint(15, 30)
-#         obj = cnvs.create_image(meteorit_x, meteorit_y, image=meterorit_image)
-#         cnvs.delete(player.obj)
-#         player.obj = (cnvs.create_oval(player.x-20, player.y-20, player.x+20, player.y+20, fill="black", width=3))
-#     meteorit_timer()
-
+#         cnvs.moveto(meteorit_obj, meteorit_x-150, meteorit_y-150)
+#         meteorit_timer()
+#         tk.after(5000, meterorit) 
 
 
 e = 0
@@ -100,7 +99,7 @@ coins_received = 0
 balance = 0
 number = None
 def restart():
-    global jump_cooldown, player, emotions, pause_image, continue_image, shield, rules_image, shield_image, help_image, shop_button, help_button, shop_image, pause_button, bombs_x, bombs_y, bombs_objs, bomb_image, brevna, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, shop_lines, game, deaths, total_deaths, coins_received, coins
+    global jump_cooldown, player, meteorit_obj, pause_image, continue_image, shield, rules_image, shield_image, help_image, shop_button, help_button, shop_image, pause_button, bombs_x, bombs_y, bombs_objs, bomb_image, brevna, cd_status_image, balance, cnvs, brevno_image, deaths_image, coin_image, cd_image, nocd_image, death_text, money_text, shop_lines, game, deaths, total_deaths, coins_received, coins
     game = True
     deaths = 0
     player = Player()
@@ -125,8 +124,6 @@ def restart():
     color = shop_lines[0]
     color = color[:-1]
     open_colors.close()
-    if balance > 999:
-        balance = 999
     cnvs = Canvas(bg=color, highlightbackground=color)
     cnvs.place(anchor=NW, height=900, width=700)
     cnvs.create_rectangle(-5, 100, 705, 105, fill="black")
@@ -134,6 +131,7 @@ def restart():
     cnvs.create_image(640, 40, image=deaths_image)
     cnvs.create_image(540, 40, image=coin_image)
     shield.obj = cnvs.create_image(shield.x, shield.y, image=shield_image)
+    meteorit_obj = cnvs.create_image(5000, 5000, image=meterorit_image)
     cd_status_image = cnvs.create_image(490, 40, image=nocd_image)
     death_text = cnvs.create_text(670, 40, text=deaths, font=("Impact", 25))
     money_text = cnvs.create_text(590, 40, text=balance, font=("Impact", 25))
@@ -454,43 +452,43 @@ def shop(event):
         Buttons[14].place(x=260, y=600, width=100, height=100)
 def meterorit():
     global meteorit_x, meteorit_y, killtime, player, meteorit_obj
-    meteorit_x = random.randint(player.x-200, player.x+200) 
-    meteorit_x = meteorit_x - meteorit_x % 12
-    meteorit_y = random.randint(player.y-200, player.y+200)
-    meteorit_y = meteorit_y - meteorit_y % 12
-    if meteorit_y < 225:
-        meteorit_y = 225
-    if meteorit_y > 675:
-        meteorit_y = 675
-    if meteorit_x < 125:
-        meteorit_x = 125
-    if meteorit_x > 675:
-        meteorit_x = 675
-    killtime = random.randint(15, 30)
-    meteorit_obj = cnvs.create_image(meteorit_x, meteorit_y, image=meterorit_image)
-    cnvs.delete(player.obj)
-    player.obj = (cnvs.create_oval(player.x-20, player.y-20, player.x+20, player.y+20, fill="black", width=3))
-    meteorit_timer()
+    if game == True:
+        meteorit_x = random.randint(player.x-200, player.x+200) 
+        meteorit_x = meteorit_x - meteorit_x % 12
+        meteorit_y = random.randint(player.y-200, player.y+200)
+        meteorit_y = meteorit_y - meteorit_y % 12
+        if meteorit_y < 225:
+            meteorit_y = 225
+        if meteorit_y > 675:
+            meteorit_y = 675
+        if meteorit_x < 150:
+            meteorit_x = 150
+        if meteorit_x > 600:
+            meteorit_x = 600
+        killtime = random.randint(15, 30)
+        cnvs.moveto(meteorit_obj, meteorit_x-150, meteorit_y-150)
+        meteorit_timer()
     tk.after(5000, meterorit)   
 
 def meteorit_timer():
     global h, deaths, player, shield
-    h = h + 1
-    if killtime == h:
-        cnvs.delete(meteorit_obj)
-        if ((meteorit_x - player.x)**2 + (meteorit_y - player.y)**2)**0.5 <= 125 and killtime == h:
-            if shield.status == True:
-                shield.status = False
-                cnvs.delete(shield.obj)
-            else:
-                deaths += 1
-                cnvs.delete(player.obj)
-                player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
-                player.x = 350
-                player.y = 840
-        h = 0
-        tk.after_cancel(meteorit_timer)
-        return
+    if game == True:
+        h = h + 1
+        if killtime == h:
+            cnvs.moveto(meteorit_obj, 5000, 5000)
+            if ((meteorit_x - player.x)**2 + (meteorit_y - player.y)**2)**0.5 <= 125 and killtime == h:
+                if shield.status == True:
+                    shield.status = False
+                    cnvs.delete(shield.obj)
+                else:
+                    deaths += 1
+                    cnvs.delete(player.obj)
+                    player.obj = (cnvs.create_oval(330, 820, 370, 860, fill="black", width=3))
+                    player.x = 350
+                    player.y = 840
+            h = 0
+            tk.after_cancel(meteorit_timer)
+            return
     tk.after(100, meteorit_timer)
 def buy_color(color, position):
     global balance, nomoney_status, Buttons
