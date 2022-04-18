@@ -468,7 +468,7 @@ def meterorit():
         killtime = random.randint(15, 30)
         cnvs.moveto(meteorit_obj, meteorit_x-150, meteorit_y-150)
         meteorit_timer()
-    tk.after(5000, meterorit)   
+        tk.after(5000, meterorit)   
 
 def meteorit_timer():
     global h, deaths, player, shield
