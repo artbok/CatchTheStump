@@ -1,0 +1,18 @@
+class Setup:
+    def save(self): 
+        self.lines = [str(balance) + "\n", str(total_deaths) + "\n", self.textentry[0].get() + "\n", self.textentry[1].get() + "\n", self.textentry[2].get() + "\n", self.textentry[3].get() + "\n"]
+        self.open_settings = open('resources/settings.txt', 'w')
+        self.open_settings.writelines(self.lines)
+        self.open_settings.close()
+    def __init__(self):
+        self.cnvs = Canvas(bg="grey25", highlightbackground="grey25")
+        self.cnvs.place(anchor=NW, height=900, width=700)
+        self.cnvs.create_text(20, 60, text="Конфигурация игры", fill="red", anchor=W, font=("Impact", 45))
+        self.cnvs.create_text(50, 190, text="Количество брёвен:", fill="white", anchor=W, font=("Impact", 30))
+        self.cnvs.create_text(50, 330, text="Количество бомб:", fill="white", anchor=W, font=("Impact", 30))
+        self.cnvs.create_text(50, 480, text="Количество монет", fill="white", anchor=W, font=("Impact", 30))
+        self.cnvs.create_text(50, 620, text="Интервал метеоритов:", fill="white", anchor=W, font=("Impact", 30))
+        self.textentry = [Entry(self.cnvs, bg="grey50", font=("Impact", 30), fg="white"), Entry(self.cnvs, bg="grey50", font=("Impact", 30), fg="white"), Entry(self.cnvs, bg="grey50", font=("Impact", 30), fg="white"), Entry(self.cnvs, bg="grey50", font=("Impact", 30), fg="white")]
+        self.entry = [self.cnvs.create_window(80, 260, window=self.textentry[0], height=60, anchor=W, width=400), self.cnvs.create_window(80, 400, window=self.textentry[1], height=60, anchor=W, width=400), self.cnvs.create_window(80, 540, window=self.textentry[2], height=60, anchor=W, width=400), self.cnvs.create_window(80, 680, window=self.textentry[3], height=60, anchor=W, width=400)]
+        close_button = Button(bg="black", text="Сохранить", command=lambda:(close_button.destroy(), self.save()), fg="white", font=("Impact", 25))
+        close_button.place(x=200, y=750, width=200, height=80)       
